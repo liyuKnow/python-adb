@@ -3,12 +3,15 @@ import tkinter.messagebox
 import customtkinter
 import subprocess
 
-customtkinter.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
+# Modes: "System" (standard), "Dark", "Light"
+customtkinter.set_appearance_mode("Dark")
 customtkinter.set_default_color_theme(
     "dark-blue"
-)  # Themes: "blue" (standard), "green", "dark-blue"
+)
 
 # ^ APPLICATION
+
+
 class App(customtkinter.CTk):
 
     WIDTH = 780
@@ -18,14 +21,13 @@ class App(customtkinter.CTk):
         super().__init__()
 
         self.title("Report app")
-        self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
+        # self.geometry()
+        # self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
         self.protocol(
             "WM_DELETE_WINDOW", self.on_closing
         )  # call .on_closing() when app gets closed
 
-        # ============ create two frames ============
-
-        # configure grid layout (2x1)
+        # ============ create one frame ============
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
 
@@ -44,7 +46,7 @@ class App(customtkinter.CTk):
 
         # configure grid layout (1x11)
         self.frame_top.grid_rowconfigure(
-            0, minsize=10
+            0, minsize=10,
         )  # empty row with minsize as spacing
 
         self.frame_top.grid_rowconfigure(3, weight=1)  # empty row as spacing
