@@ -1,6 +1,8 @@
 from tkinter import *
 import customtkinter
 import subprocess
+import os
+from pathlib import Path
 # import filedialog module
 from tkinter import filedialog
 
@@ -9,6 +11,10 @@ class App(customtkinter.CTk):
 
     WIDTH = 800
     HEIGHT = 600
+    FILE_TO_SEND = ''
+    FILE_TO_GET = ''
+    DEVICE = ''
+    PREV_DIR = ''
 
     def __init__(self):
         super().__init__()
@@ -31,6 +37,8 @@ class App(customtkinter.CTk):
         self.protocol(
             "WM_DELETE_WINDOW", self.on_closing
         )  # call when app gets closed
+
+        self.setPrevDIR()
 
         # TODO : MAKE WINDOW DRAGGABLE
 
@@ -75,7 +83,7 @@ class App(customtkinter.CTk):
         # * FILE INPUT + FILENAME LABEL + FILE TITLE LABEL
         self.BrowseFile = customtkinter.CTkButton(
             master=self,
-            command=self.push_button_event,
+            command=self.browseFiles,
             text="Browse File",
             text_font="none 12",
             text_color="#3b8cc6",
@@ -127,20 +135,18 @@ class App(customtkinter.CTk):
 
         self.FailFeedbackLabel = customtkinter.CTkLabel(
             height=42,
-            text="Something went wrong while sending file",
             text_font="none 12",
             text_color="#c75d55",
         )
 
         # ^ PLACING
         self.Send_Button.place(x=36, y=190)
-        self.SuccessFeedbackLabel.place(x=172, y=190)
 
         # & THIRD ROW
         # * GET BUTTON + FEEDBACK LABEL
         self.Get_Button = customtkinter.CTkButton(
             master=self,
-            command=self.push_button_event,
+            command=self.pull_button_event,
             text="GET FILE",
             text_font="none 12",
             text_color="#3b8cc6",
@@ -165,16 +171,75 @@ class App(customtkinter.CTk):
     # ^ ============== ADB FUNCTIONS ========================
 
     def pull_button_event(self):
-        pull_command = "adb pull /storage/emulated/0/Download/usersDownload.xlsx C:/Users/Liyu/Desktop"
-        subprocess.call(pull_command, shell=True)
-        print("Success")
+        file_path = os.path.expanduser('~')
+        pull_command = f"adb pull /storage/emulated/0/Download/NewCounter.txt {file_path}\Desktop"
+        with subprocess.Popen(pull_command, stdout=subprocess.PIPE, stderr=None, shell=True) as process:
+            output = process.communicate()[0].decode("utf-8")
+            print(output)
 
     def push_button_event(self):
-        pull_command = (
-            "adb push C:/Users/Liyu/Desktop/VeryNew.xlsx /storage/emulated/0/Download/"
-        )
-        subprocess.call(pull_command, shell=True)
-        print("Success")
+        print(f"bool is {App.FILE_TO_SEND != ''}")
+        if (App.FILE_TO_SEND != ''):
+            connect_command = "adb get-state"
+            subprocess.call(connect_command, shell=True)
+
+            # if (App.DEVICE != ''):
+            pull_command = (
+                f"adb push {App.FILE_TO_SEND} /storage/emulated/0/Download/"
+            )
+            subprocess.call(pull_command, shell=True)
+            self.SuccessFeedbackLabel.place(x=172, y=190)
+            # CHECK IF FILE EXISTS IN THE DEVICE
+            # No Device
+            # else:
+            #     self.FailFeedbackLabel.configure(
+            #         text="No Devices are connected, connect to device and try again.",)
+            #     self.FailFeedbackLabel.place(x=172, y=190)
+        else:
+            # No file chosen
+            self.FailFeedbackLabel.configure(
+                text="No File chosen, choose file and try again.",)
+            self.FailFeedbackLabel.place(x=172, y=190)
+
+    # ^ ============== FILE FUNCTIONS ========================
+    def browseFiles(self):
+        initialDIR = App.PREV_DIR if App.PREV_DIR != '' else '/'
+        App.FILE_TO_SEND = filedialog.askopenfilename(initialdir=initialDIR,
+                                                      title="Select a File",
+                                                      filetypes=(("Excel Files",
+                                                                  "*.xlsx*"),
+                                                                 ("all files",
+                                                                  "*.*")))
+        # ^ GET PREVIOUS DIRECTORY
+        # TODO : SAVE DIRECTORY TO A FILE FOR RELOAD
+        if (App.FILE_TO_SEND != ''):
+            temp = App.FILE_TO_SEND.split('/')
+            App.PREV_DIR = "/".join(temp[:-1])
+            # ^ SAVING FOR WHEN APP IS RELOADED
+            if not os.path.exists(".report_preferences/"):
+                os.mkdir(".report_preferences/")
+
+            with open('.report_preferences/.preferences.txt', 'w') as f:
+                f.write(f'PREV_DIR={App.PREV_DIR}')
+
+            self.setPrevDIR()
+
+        print(f"File_TO_SEND IS {App.FILE_TO_SEND}")
+        # Change label contents
+        self.FilenameLabel.configure(text="File Opened: "+App.FILE_TO_SEND)
+
+    def setPrevDIR(self):
+        preference_file = '.report_preferences/.preferences.txt'
+        if (os.path.exists(preference_file) and os.path.isfile(preference_file)):
+            with open(preference_file, 'r') as f:
+                lines = f.readlines()
+                for line in lines:
+                    if 'PREV_DIR' in line:
+                        previous_dir = line.split('=')[1]
+                        if (previous_dir):
+                            App.PREV_DIR = previous_dir
+                        else:
+                            App.PREV_DIR = "/"
 
 
 if __name__ == "__main__":
