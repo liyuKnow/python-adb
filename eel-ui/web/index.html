@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eel File</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="/eel.js"></script>
+    <script >
+        async function getGreetingFromPython() {
+            getElementById("title").innerText = await eel.greet_html();
+        }
+
+        document.getElementById('btn').addEventListener('click', () => {
+            getGreetingFromPython()
+            // getElementById("test").innerHTML = '<h1>Tell Me Why</h1>'
+        })
+    </script>
+</head>
+<body>
+    <h1 id="title">Hello World</h1>
+    <div id="test">Hello World</div>
+    <button id="btn">Click Me!</button>
+    
+</body>
+</html>

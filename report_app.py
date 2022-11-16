@@ -68,7 +68,7 @@ class App(customtkinter.CTk):
         # ^ PLACING
         self.Close_Button.place(x=715, y=20)
 
-        # & ROW 2
+        # & ROW 1
         # * FILE INPUT + FILENAME LABEL + FILE TITLE LABEL
         self.FilenameLabel = customtkinter.CTkLabel(
             height=42,
