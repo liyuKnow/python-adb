@@ -162,7 +162,7 @@ class App(customtkinter.CTk):
                              pady=10, padx=20, sticky="we")
 
         self.check_box_1 = customtkinter.CTkCheckBox(master=self.frame_right,
-                                                     text="CTkCheckBox")
+                                                     text="CTkCheckBox",)
         self.check_box_1.grid(row=6, column=0, pady=10, padx=20, sticky="w")
 
         self.check_box_2 = customtkinter.CTkCheckBox(master=self.frame_right,
