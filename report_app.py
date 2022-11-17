@@ -169,6 +169,11 @@ class App(customtkinter.CTk):
         self.destroy()
 
     # ^ ============== ADB FUNCTIONS ========================
+    def check_devices(self):
+        devices_command = f"adb devices"
+        with subprocess.Popen(devices_command, stdout=subprocess.PIPE, stderr=None, shell=True) as process:
+            output = process.communicate()[0].decode("utf-8")
+            print(output)
 
     def pull_button_event(self):
         file_path = os.path.expanduser('~')
